@@ -6,6 +6,10 @@ from PIL import Image
 
 app = FastAPI()
 
+@app.get("/")
+def root():
+    return {"message": "Elephant detection API is online!"}
+
 class ImageRequest(BaseModel):
     image: str
 
