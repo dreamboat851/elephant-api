@@ -16,21 +16,25 @@ class ImageRequest(BaseModel):
 @app.post("/detect-elephants")
 def detect_elephants(req: ImageRequest):
     try:
-        # Strip the MIME type prefix
+        print("📥 Received base64 string starts with:", req.image[:50])
+        print("📥 Total length:", len(req.image))
+        
+        # Strip the MIME prefix if present
         if "," in req.image:
-            base64_str = req.image.split(",")[1]  # Only get the part after 'base64,'
+            base64_str = req.image.split(",")[1]
         else:
-            base64_str = req.image  # Fallback
+            base64_str = req.image
 
         # Decode base64 image
         image_data = base64.b64decode(base64_str)
         image = Image.open(BytesIO(image_data))
 
-        # Dummy detection
+        # Dummy logic
         width, height = image.size
         count = 1
         boxes = [{"x": int(width * 0.1), "y": int(height * 0.1), "w": int(width * 0.6), "h": int(height * 0.5)}]
 
         return {"count": count, "boxes": boxes}
     except Exception as e:
+        print("🚨 ERROR:", str(e))
         raise HTTPException(status_code=400, detail=str(e))
