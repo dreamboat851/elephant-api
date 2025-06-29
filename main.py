@@ -16,8 +16,8 @@ class ImageRequest(BaseModel):
 @app.post("/detect-elephants")
 def detect_elephants(req: ImageRequest):
     try:
-        print("📥 Received base64 string starts with:", req.image[:50])
-        print("📥 Total length:", len(req.image))
+        #print("📥 Received base64 string starts with:", req.image[:50])
+        #print("📥 Total length:", len(req.image))
         
         # Strip the MIME prefix if present
         if "," in req.image:
