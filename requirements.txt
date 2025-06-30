@@ -4,4 +4,5 @@ Pillow
 fastapi
 uvicorn
 opencv-python-headless
+pandas
 
