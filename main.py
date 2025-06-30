@@ -16,9 +16,6 @@ class ImageRequest(BaseModel):
 @app.post("/detect-elephants")
 def detect_elephants(req: ImageRequest):
     try:
-        #print("📥 Received base64 string starts with:", req.image[:50])
-        #print("📥 Total length:", len(req.image))
-        
         # Strip the MIME prefix if present
         if "," in req.image:
             base64_str = req.image.split(",")[1]
@@ -29,12 +26,29 @@ def detect_elephants(req: ImageRequest):
         image_data = base64.b64decode(base64_str)
         image = Image.open(BytesIO(image_data))
 
-        # Dummy logic
+        # Dummy detection logic
         width, height = image.size
-        count = 1
-        boxes = [{"x": int(width * 0.1), "y": int(height * 0.1), "w": int(width * 0.6), "h": int(height * 0.5)}]
 
-        return {"count": count, "boxes": boxes}
+        # Simulated two elephant detections
+        boxes = [
+            {
+                "x": int(width * 0.1),
+                "y": int(height * 0.1),
+                "w": int(width * 0.4),
+                "h": int(height * 0.5),
+                "confidence": 0.87
+            },
+            {
+                "x": int(width * 0.55),
+                "y": int(height * 0.2),
+                "w": int(width * 0.3),
+                "h": int(height * 0.4),
+                "confidence": 0.91
+            }
+        ]
+
+        return {"count": len(boxes), "boxes": boxes}
+
     except Exception as e:
         print("🚨 ERROR:", str(e))
         raise HTTPException(status_code=400, detail=str(e))
