@@ -17,3 +17,6 @@ thop>=0.1.1
 tqdm>=4.66.3
 setuptools>=70.0.0
 
+# Web server (FastAPI + Uvicorn)
+fastapi
+uvicorn[standard]
