@@ -32,7 +32,7 @@ def detect_elephants_api(req: ImageRequest):
 
         return {
             "count": count,
-            "boxes": boxes
+            "boxes": boxes  # each box includes x, y, w, h, confidence
         }
 
     except Exception as e:
