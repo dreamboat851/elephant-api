@@ -1,31 +1,46 @@
 import torch
-import numpy as np
+from pathlib import Path
 from PIL import Image
+import sys
 
-# Load the YOLOv5 model
-model = torch.hub.load('ultralytics/yolov5', 'custom', path='yolov5s.pt', force_reload=False)
-model.eval()
+# Append the local YOLOv5 directory to sys.path
+sys.path.append(str(Path(__file__).resolve().parent / "yolov5"))
 
-# COCO class index for elephants is 21
-ELEPHANT_CLASS_ID = 21
+from models.common import DetectMultiBackend
+from utils.datasets import LoadImages
+from utils.general import non_max_suppression, scale_coords
+from utils.torch_utils import select_device
+
+# Load model
+device = select_device('')
+model = DetectMultiBackend(weights='yolov5s.pt', device=device)
+model.model.float().eval()
+
+ELEPHANT_CLASS_ID = 21  # COCO class ID for elephants
 
 def detect_elephants(image: Image.Image):
-    # Convert PIL image to format expected by YOLOv5
-    results = model(image)
+    import torchvision.transforms as transforms
+    import numpy as np
 
-    detections = results.xyxy[0]  # Bounding boxes (x1, y1, x2, y2, conf, class)
-    elephant_detections = []
+    transform = transforms.ToTensor()
+    img_tensor = transform(image).unsqueeze(0).to(device)
 
-    for det in detections:
-        class_id = int(det[5].item())
-        if class_id == ELEPHANT_CLASS_ID:
-            x1, y1, x2, y2, conf, _ = det.tolist()
-            elephant_detections.append({
-                "x": int(x1),
-                "y": int(y1),
-                "w": int(x2 - x1),
-                "h": int(y2 - y1),
-                "confidence": round(conf, 3)
-            })
+    pred = model(img_tensor)[0]
+    pred = non_max_suppression(pred, conf_thres=0.25, iou_thres=0.45)[0]
 
-    return len(elephant_detections), elephant_detections
+    detections = []
+
+    if pred is not None and len(pred):
+        pred[:, :4] = scale_coords(img_tensor.shape[2:], pred[:, :4], image.size).round()
+        for *xyxy, conf, cls in pred:
+            if int(cls.item()) == ELEPHANT_CLASS_ID:
+                x1, y1, x2, y2 = [int(c.item()) for c in xyxy]
+                detections.append({
+                    "x": x1,
+                    "y": y1,
+                    "w": x2 - x1,
+                    "h": y2 - y1,
+                    "confidence": round(conf.item(), 3)
+                })
+
+    return len(detections), detections
