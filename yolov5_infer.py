@@ -11,7 +11,7 @@ from utils.general import non_max_suppression, scale_boxes
 from utils.torch_utils import select_device
 
 # Constants
-ELEPHANT_CLASS_ID = 21  # COCO class ID for elephant
+ELEPHANT_CLASS_ID = 20  # COCO class ID for elephant
 
 # Setup
 device = select_device('')
