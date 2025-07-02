@@ -7,32 +7,32 @@ from yolov5_infer import detect_elephants
 
 app = FastAPI()
 
+
 @app.get("/")
 def root():
     return {"message": "Elephant detection API is online!"}
 
+
 class ImageRequest(BaseModel):
-    image: str  # base64-encoded string with MIME prefix
+    image: str  # base64-encoded image with optional MIME prefix (e.g. "data:image/png;base64,...")
+
 
 @app.post("/detect-elephants")
 def detect_elephants_api(req: ImageRequest):
     try:
-        # Extract base64 string from data URI
-        if "," in req.image:
-            base64_str = req.image.split(",")[1]
-        else:
-            base64_str = req.image
+        # Extract base64 image string
+        base64_str = req.image.split(",")[-1]
 
-        # Decode base64 to image
+        # Decode and load image
         image_data = base64.b64decode(base64_str)
         image = Image.open(BytesIO(image_data)).convert("RGB")
 
-        # Run elephant detection
+        # Run detection
         count, boxes = detect_elephants(image)
 
         return {
             "count": count,
-            "boxes": boxes  # each box includes x, y, w, h, confidence
+            "boxes": boxes  # list of dicts with x, y, w, h, confidence
         }
 
     except Exception as e:
