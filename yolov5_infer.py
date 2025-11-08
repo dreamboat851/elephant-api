@@ -11,13 +11,6 @@ from utils.general import check_img_size, non_max_suppression, scale_boxes
 from utils.torch_utils import select_device
 from utils.augmentations import letterbox
 
-# Fix for PyTorch 2.6+ weights loading - CORRECTED VERSION
-try:
-    import numpy.core.multiarray
-    torch.serialization.add_safe_globals([numpy.core.multiarray._reconstruct])
-except (AttributeError, ImportError):
-    pass  # Older PyTorch versions or missing numpy internals
-
 # Set up device and model
 device = select_device('')
 model = DetectMultiBackend('yolov5s.pt', device=device)
